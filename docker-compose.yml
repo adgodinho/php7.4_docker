@@ -1,0 +1,30 @@
+version: '3.5'
+services:
+  php:
+    container_name: php
+    image: php/7.4-apache
+    build:
+      context: docker/php/7.4
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${PWD}:/var/www/html
+      - ${PWD}/docker/php/7.4/config/httpd.conf:/etc/httpd/conf/httpd.conf
+      - ${PWD}/docker/php/7.4/config/php.ini:/usr/local/zend/etc/php.ini
+    networks:
+      - net_local
+    depends_on:
+      - memcached
+
+  memcached:
+    container_name: "memcached_local"
+    image: memcached
+    ports:
+      - "11211:11211"
+    networks:
+      - net_local
+
+networks:
+  net_local:
+    driver: bridge
