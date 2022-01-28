@@ -1,12 +1,25 @@
 version: '3.5'
 services:
+  mysql:
+    container_name: mysql_teste
+    image: inforgeneses/mysql:5.1.73
+    build:
+      context: docker/mysql/5.1.73
+    ports:
+      - "3306:3306"
+    networks:
+      - net_local
+    volumes:
+      - mysql_data3:/var/lib/mysql
+      - ${PWD}/docker/mysql/databases:/databases
+
   php:
     container_name: php
     image: php/7.4-apache
     build:
       context: docker/php/7.4
     ports:
-      - "80:80"
+      - "8081:80"
       - "443:443"
     volumes:
       - ${PWD}:/var/www/html
@@ -15,6 +28,7 @@ services:
     networks:
       - net_local
     depends_on:
+      - mysql
       - memcached
 
   memcached:
@@ -28,3 +42,12 @@ services:
 networks:
   net_local:
     driver: bridge
+
+volumes:
+  # MySQL data
+  mysql_data3:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/docker/mysql/5.1.73/data
